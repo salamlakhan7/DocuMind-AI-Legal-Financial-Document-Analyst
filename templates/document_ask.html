@@ -1,0 +1,70 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Ask AI - DocuMind{% endblock %}
+{% block page_title %}Ask AI{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <section class="rounded-2xl border border-slate-200 bg-white p-8 shadow-soft">
+        <p class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-primary-700">Grounded Answer Generation</p>
+        <h2 class="text-2xl font-bold text-slate-950">{{ document.title }}</h2>
+        <p class="mt-3 max-w-2xl text-slate-600">
+            Ask a question and DocuMind will answer only from retrieved document chunks, with source references.
+        </p>
+
+        <form method="post" class="mt-8 space-y-5">
+            {% csrf_token %}
+            <div>
+                <label for="question" class="mb-2 block text-sm font-semibold text-slate-700">Question</label>
+                <textarea
+                    id="question"
+                    name="question"
+                    rows="4"
+                    required
+                    class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-950 shadow-sm outline-none transition focus:border-primary-600 focus:ring-4 focus:ring-blue-100"
+                    placeholder="What are the key obligations in this document?"
+                >{{ question }}</textarea>
+            </div>
+            <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <a href="{% url 'documents:detail' document.pk %}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-primary-100 hover:text-primary-700 hover:shadow-md">
+                    Back to document
+                </a>
+                <button type="submit" data-loading-text="Generating..." class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+                    Generate Answer
+                </button>
+            </div>
+        </form>
+    </section>
+
+    {% if answer_result %}
+        <section class="rounded-2xl border border-slate-200 bg-white p-8 shadow-soft">
+            <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary-700">Answer</p>
+                    <h3 class="mt-2 text-xl font-bold text-slate-950">{{ answer_result.question }}</h3>
+                </div>
+                <span class="w-fit rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-primary-700">{{ answer_result.model_name }}</span>
+            </div>
+            <div class="prose max-w-none whitespace-pre-wrap text-slate-700">{{ answer_result.answer }}</div>
+            <p class="mt-6 text-sm text-slate-500">{{ answer_result.retrieved_count }} chunks used for context.</p>
+        </section>
+
+        <section class="space-y-4">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary-700">Sources</p>
+                <h3 class="mt-2 text-xl font-bold text-slate-950">Retrieved Evidence</h3>
+            </div>
+            {% for source in answer_result.sources %}
+                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
+                    <div class="mb-4 flex flex-wrap items-center gap-3">
+                        <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-primary-700">Page {{ source.page_number }}</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Chunk {{ source.chunk_index|add:1 }}</span>
+                        <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Score {{ source.score|floatformat:3 }}</span>
+                    </div>
+                    <p class="text-sm leading-6 text-slate-600">{{ source.content_preview }}</p>
+                </article>
+            {% endfor %}
+        </section>
+    {% endif %}
+</div>
+{% endblock %}

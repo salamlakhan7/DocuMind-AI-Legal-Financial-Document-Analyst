@@ -1,0 +1,185 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}{{ document.title }} - DocuMind{% endblock %}
+{% block page_title %}Document Detail{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <section class="rounded-2xl border border-slate-200 bg-white p-8 shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
+        <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <p class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-primary-700">Document</p>
+                <h2 class="text-2xl font-bold text-slate-950">{{ document.title }}</h2>
+                <p class="mt-3 text-slate-600">{{ document.original_filename }}</p>
+            </div>
+            <span class="inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold {% if document.status == 'ready' %}bg-emerald-50 text-emerald-700{% elif document.status == 'failed' %}bg-red-50 text-red-700{% elif document.status == 'processing' %}bg-blue-50 text-primary-700{% else %}bg-amber-50 text-amber-700{% endif %}">
+                {{ document.get_status_display }}
+            </span>
+        </div>
+    </section>
+
+    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary-700">Processing</p>
+                <h3 class="mt-2 text-xl font-bold text-slate-950">Processing Status</h3>
+            </div>
+            {% if processing %}
+                <span class="inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold {% if processing.status == 'completed' %}bg-emerald-50 text-emerald-700{% elif processing.status == 'failed' %}bg-red-50 text-red-700{% elif processing.status == 'processing' %}bg-blue-50 text-primary-700{% else %}bg-amber-50 text-amber-700{% endif %}">
+                    {{ processing.get_status_display }}
+                </span>
+            {% else %}
+                <span class="inline-flex w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                    Not created
+                </span>
+            {% endif %}
+        </div>
+
+        <div class="grid gap-5 md:grid-cols-2">
+            <div class="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <p class="text-sm font-medium text-slate-500">Current Status</p>
+                <p class="mt-2 font-semibold text-slate-950">{% if processing %}{{ processing.get_status_display }}{% else %}Not available{% endif %}</p>
+            </div>
+            <div class="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <p class="text-sm font-medium text-slate-500">Processing Version</p>
+                <p class="mt-2 font-semibold text-slate-950">{% if processing %}{{ processing.processing_version }}{% else %}Not available{% endif %}</p>
+            </div>
+            <div class="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <p class="text-sm font-medium text-slate-500">Started</p>
+                <p class="mt-2 font-semibold text-slate-950">{% if processing.started_at %}{{ processing.started_at|date:"M j, Y g:i A" }}{% else %}Not started{% endif %}</p>
+            </div>
+            <div class="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <p class="text-sm font-medium text-slate-500">Completed</p>
+                <p class="mt-2 font-semibold text-slate-950">{% if processing.completed_at %}{{ processing.completed_at|date:"M j, Y g:i A" }}{% else %}Not completed{% endif %}</p>
+            </div>
+            <div class="rounded-xl border border-slate-100 bg-slate-50 p-4 md:col-span-2">
+                <p class="text-sm font-medium text-slate-500">Processing Time</p>
+                <p class="mt-2 font-semibold text-slate-950">{% if processing.processing_time_ms %}{{ processing.processing_time_ms }} ms{% else %}Not available{% endif %}</p>
+            </div>
+        </div>
+
+        {% if processing.error_message %}
+            <div class="mt-5 rounded-xl border border-red-100 bg-red-50 p-4 text-red-800">
+                <p class="text-sm font-semibold">Processing error</p>
+                <p class="mt-2 text-sm">{{ processing.error_message }}</p>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary-700">Embeddings</p>
+                <h3 class="mt-2 text-xl font-bold text-slate-950">Embedding Metadata</h3>
+            </div>
+            <span class="inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold {% if embedded_chunks_count == document.chunk_count and document.chunk_count %}bg-emerald-50 text-emerald-700{% elif embedded_chunks_count %}bg-amber-50 text-amber-700{% else %}bg-slate-100 text-slate-600{% endif %}">
+                {% if embedded_chunks_count == document.chunk_count and document.chunk_count %}Complete{% elif embedded_chunks_count %}Partial{% else %}Not embedded{% endif %}
+            </span>
+        </div>
+
+        <div class="grid gap-5 md:grid-cols-2">
+            <div class="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <p class="text-sm font-medium text-slate-500">Embedded Chunks</p>
+                <p class="mt-2 font-semibold text-slate-950">{{ embedded_chunks_count }} of {{ document.chunk_count }}</p>
+            </div>
+            <div class="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <p class="text-sm font-medium text-slate-500">Embedding Model</p>
+                <p class="mt-2 font-semibold text-slate-950">{{ embedding_model|default:"Not available" }}</p>
+            </div>
+            <div class="rounded-xl border border-slate-100 bg-slate-50 p-4 md:col-span-2">
+                <p class="text-sm font-medium text-slate-500">Vector Dimension</p>
+                <p class="mt-2 font-semibold text-slate-950">{{ embedding_dimension|default:"Not available" }}</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid gap-5 md:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+            <p class="text-sm font-medium text-slate-500">File size</p>
+            <p class="mt-2 text-lg font-semibold text-slate-950">{{ document.file_size|filesizeformat }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+            <p class="text-sm font-medium text-slate-500">File type</p>
+            <p class="mt-2 text-lg font-semibold text-slate-950">{{ document.file_type }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+            <p class="text-sm font-medium text-slate-500">Page count</p>
+            <p class="mt-2 text-lg font-semibold text-slate-950">{{ document.page_count|default:"Not processed" }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+            <p class="text-sm font-medium text-slate-500">Chunk count</p>
+            <p class="mt-2 text-lg font-semibold text-slate-950">{{ document.chunk_count }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+            <p class="text-sm font-medium text-slate-500">Uploaded</p>
+            <p class="mt-2 text-lg font-semibold text-slate-950">{{ document.created_at|date:"M j, Y g:i A" }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+            <p class="text-sm font-medium text-slate-500">Last updated</p>
+            <p class="mt-2 text-lg font-semibold text-slate-950">{{ document.updated_at|date:"M j, Y g:i A" }}</p>
+        </div>
+    </section>
+
+    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary-700">Chunks</p>
+                <h3 class="mt-2 text-xl font-bold text-slate-950">Text Chunk Preview</h3>
+            </div>
+            <span class="inline-flex w-fit rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-primary-700">
+                {{ document.chunk_count }} total
+            </span>
+        </div>
+
+        {% if chunk_previews %}
+            <div class="grid gap-4 lg:grid-cols-3">
+                {% for chunk in chunk_previews %}
+                    <article class="max-h-48 overflow-y-auto rounded-xl border border-slate-100 bg-slate-50 p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md">
+                        <div class="mb-3 flex items-center justify-between gap-3">
+                            <p class="text-sm font-semibold text-slate-950">Chunk {{ chunk.chunk_index|add:1 }}</p>
+                            <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600">Page {{ chunk.page_number }}</span>
+                        </div>
+                        <p class="text-sm leading-6 text-slate-600">{{ chunk.content|truncatechars:150 }}</p>
+                        <p class="mt-4 text-xs font-medium text-slate-500">{{ chunk.word_count }} words · {{ chunk.character_count }} characters</p>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                <h4 class="font-semibold text-slate-950">No chunks available</h4>
+                <p class="mt-2 text-sm text-slate-600">Chunks will appear here after a PDF with extractable text is processed.</p>
+            </div>
+        {% endif %}
+    </section>
+
+    {% if document.error_message %}
+        <section class="rounded-2xl border border-red-100 bg-red-50 p-6 text-red-800 shadow-soft">
+            <h3 class="font-semibold">Error message</h3>
+            <p class="mt-2 text-sm">{{ document.error_message }}</p>
+        </section>
+    {% endif %}
+
+    <div class="flex flex-wrap gap-3">
+        <a href="{{ document.file.url }}" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+            Open PDF
+        </a>
+        {% if document.status == 'ready' and document.chunk_count > 0 %}
+            <a href="{% url 'chat:document' document.pk %}" class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+                Chat with Document
+            </a>
+            <a href="{% url 'documents:ask' document.pk %}" class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+                Ask AI
+            </a>
+            <a href="{% url 'documents:retrieve' document.pk %}" class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+                Test Retrieval
+            </a>
+        {% endif %}
+        <a href="{% url 'documents:list' %}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-primary-100 hover:text-primary-700 hover:shadow-md">
+            Back to documents
+        </a>
+        <a href="{% url 'documents:delete' document.pk %}" class="inline-flex items-center justify-center rounded-xl border border-red-100 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-red-100 hover:shadow-md">
+            Delete
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Conversation History - DocuMind{% endblock %}
+{% block page_title %}Conversation History{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <section class="rounded-2xl border border-slate-200 bg-white p-8 shadow-soft">
+        <p class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-primary-700">History</p>
+        <h2 class="text-2xl font-bold text-slate-950">Conversation History</h2>
+        <p class="mt-4 max-w-2xl text-slate-600">
+            Reopen previous document chat sessions and continue from the saved conversation.
+        </p>
+    </section>
+
+    {% if sessions %}
+        <section class="grid gap-5">
+            {% for session in sessions %}
+                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
+                    <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-950">{{ session.title }}</h3>
+                            <p class="mt-2 text-sm text-slate-500">{{ session.document.title }}</p>
+                            <p class="mt-3 text-sm text-slate-600">
+                                Updated {{ session.updated_at|date:"M j, Y g:i A" }} · {{ session.messages.count }} messages
+                            </p>
+                        </div>
+                        <a href="{% url 'chat:document' session.document.pk %}" class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+                            Reopen Chat
+                        </a>
+                    </div>
+                </article>
+            {% endfor %}
+        </section>
+    {% else %}
+        <section class="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-soft">
+            <h3 class="text-xl font-bold text-slate-950">No conversations yet</h3>
+            <p class="mx-auto mt-3 max-w-xl text-slate-600">
+                Start a document chat and your conversation history will appear here.
+            </p>
+            <a href="{% url 'chat:home' %}" class="mt-6 inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+                Open AI Chat
+            </a>
+        </section>
+    {% endif %}
+</div>
+{% endblock %}

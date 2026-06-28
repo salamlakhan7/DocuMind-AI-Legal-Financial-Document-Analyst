@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="DocuMind dashboard">
+    <title>{% block title %}DocuMind Dashboard{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: "#eff6ff",
+                            100: "#dbeafe",
+                            600: "#2563eb",
+                            700: "#1d4ed8",
+                            900: "#1e3a8a"
+                        }
+                    },
+                    boxShadow: {
+                        soft: "0 18px 45px rgba(15, 23, 42, 0.08)"
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-950 antialiased">
+    <div class="min-h-screen lg:flex">
+        <div id="sidebar-backdrop" class="fixed inset-0 z-30 hidden bg-slate-950/40 lg:hidden"></div>
+
+        <aside id="dashboard-sidebar" class="fixed inset-y-0 left-0 z-40 flex w-72 -translate-x-full flex-col border-r border-slate-200 bg-white shadow-2xl shadow-slate-900/10 transition-transform duration-300 lg:static lg:translate-x-0 lg:shadow-none">
+            <div class="flex h-16 items-center justify-between border-b border-slate-200 px-6">
+                <a href="{% url 'core:dashboard' %}" class="flex items-center gap-3">
+                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-sm font-bold text-white shadow-lg shadow-blue-600/20">
+                        DM
+                    </span>
+                    <span class="text-lg font-semibold tracking-tight">DocuMind</span>
+                </a>
+                <button type="button" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 lg:hidden" data-sidebar-close aria-label="Close sidebar">
+                    <span aria-hidden="true">x</span>
+                </button>
+            </div>
+
+            <nav class="flex-1 space-y-1 px-4 py-6" aria-label="Dashboard navigation">
+                <a href="{% url 'core:dashboard' %}" data-nav-link class="dashboard-nav-link" {% if request.resolver_match.url_name == "dashboard" %}aria-current="page"{% endif %}>
+                    Dashboard
+                </a>
+                <a href="{% url 'documents:list' %}" data-nav-link class="dashboard-nav-link" {% if request.resolver_match.app_name == "documents" %}aria-current="page"{% endif %}>
+                    My Documents
+                </a>
+                <a href="{% url 'chat:home' %}" data-nav-link class="dashboard-nav-link" {% if request.resolver_match.app_name == "chat" and request.resolver_match.url_name != "history" %}aria-current="page"{% endif %}>
+                    AI Chat
+                </a>
+                <a href="{% url 'chat:history' %}" data-nav-link class="dashboard-nav-link" {% if request.resolver_match.app_name == "chat" and request.resolver_match.url_name == "history" %}aria-current="page"{% endif %}>
+                    Conversation History
+                </a>
+                <a href="{% url 'core:settings' %}" data-nav-link class="dashboard-nav-link" {% if request.resolver_match.url_name == "settings" %}aria-current="page"{% endif %}>
+                    Settings
+                </a>
+            </nav>
+        </aside>
+
+        <div class="flex min-h-screen flex-1 flex-col">
+            <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
+                <div class="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+                    <div class="flex items-center gap-3">
+                        <button type="button" class="rounded-xl border border-slate-200 bg-white p-2 text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:border-primary-100 hover:text-primary-700 lg:hidden" data-sidebar-open aria-label="Open sidebar">
+                            <span class="flex h-5 w-5 flex-col justify-center gap-1" aria-hidden="true">
+                                <span class="block h-0.5 rounded-full bg-current"></span>
+                                <span class="block h-0.5 rounded-full bg-current"></span>
+                                <span class="block h-0.5 rounded-full bg-current"></span>
+                            </span>
+                        </button>
+                        <div>
+                            <p class="text-xs font-medium uppercase tracking-[0.18em] text-primary-700">Workspace</p>
+                            <h1 class="text-lg font-semibold text-slate-950 sm:text-xl">{% block page_title %}Dashboard{% endblock %}</h1>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <div class="hidden text-right sm:block">
+                            <p class="text-sm font-semibold text-slate-950">{{ request.user.get_username }}</p>
+                            <p class="text-xs text-slate-500">Signed in</p>
+                        </div>
+                        <form method="post" action="{% url 'accounts:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-primary-100 hover:text-primary-700 hover:shadow-md">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 px-4 py-8 sm:px-6 lg:px-8">
+                <div class="mx-auto max-w-6xl">
+                    {% if messages %}
+                        <div class="mb-6 space-y-3">
+                            {% for message in messages %}
+                                <div class="rounded-xl border px-4 py-3 text-sm shadow-sm {% if message.tags == 'success' %}border-emerald-100 bg-emerald-50 text-emerald-800{% elif message.tags == 'error' %}border-red-100 bg-red-50 text-red-800{% else %}border-blue-100 bg-blue-50 text-primary-900{% endif %}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% block content %}{% endblock %}
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
