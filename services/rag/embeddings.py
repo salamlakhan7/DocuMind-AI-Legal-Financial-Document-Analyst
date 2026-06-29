@@ -10,6 +10,8 @@ from .exceptions import EmbeddingError, EmbeddingModelError
 
 logger = logging.getLogger(__name__)
 
+EMBEDDING_BATCH_SIZE = 4
+
 
 @dataclass(frozen=True)
 class EmbeddingResult:
@@ -38,6 +40,7 @@ class EmbeddingService:
                 return []
             vectors = self._model().encode(
                 texts,
+                batch_size=EMBEDDING_BATCH_SIZE,
                 normalize_embeddings=True,
                 convert_to_numpy=True,
             )
@@ -63,6 +66,7 @@ class EmbeddingService:
         try:
             vector = self._model().encode(
                 text,
+                batch_size=1,
                 normalize_embeddings=True,
                 convert_to_numpy=True,
             )

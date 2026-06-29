@@ -4,6 +4,6 @@
     "buildCommand": "python manage.py collectstatic --noinput"
   },
   "deploy": {
-    "startCommand": "gunicorn config.wsgi:application"
+    "startCommand": "gunicorn config.wsgi:application --timeout 180 --workers 1"
   }
 }
