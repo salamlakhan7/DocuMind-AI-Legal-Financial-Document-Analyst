@@ -160,17 +160,21 @@
     {% endif %}
 
     <div class="flex flex-wrap gap-3">
-        <a href="{{ document.file.url }}" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+        <a href="{{ document.file.url }}" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-950/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+            <i data-lucide="external-link" class="h-4 w-4"></i>
             Open PDF
         </a>
         {% if document.status == 'ready' and document.chunk_count > 0 %}
-            <a href="{% url 'chat:document' document.pk %}" class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+            <a href="{% url 'chat:document' document.pk %}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-950/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+                <i data-lucide="message-circle" class="h-4 w-4"></i>
                 Chat with Document
             </a>
-            <a href="{% url 'documents:ask' document.pk %}" class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+            <a href="{% url 'documents:ask' document.pk %}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-950/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+                <i data-lucide="sparkles" class="h-4 w-4"></i>
                 Ask AI
             </a>
-            <a href="{% url 'documents:retrieve' document.pk %}" class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+            <a href="{% url 'documents:retrieve' document.pk %}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-950/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+                <i data-lucide="search" class="h-4 w-4"></i>
                 Test Retrieval
             </a>
         {% endif %}

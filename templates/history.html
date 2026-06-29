@@ -25,7 +25,8 @@
                                 Updated {{ session.updated_at|date:"M j, Y g:i A" }} · {{ session.messages.count }} messages
                             </p>
                         </div>
-                        <a href="{% url 'chat:document' session.document.pk %}" class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+                        <a href="{% url 'chat:document' session.document.pk %}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-950/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+                            <i data-lucide="message-circle" class="h-4 w-4"></i>
                             Reopen Chat
                         </a>
                     </div>
@@ -38,7 +39,8 @@
             <p class="mx-auto mt-3 max-w-xl text-slate-600">
                 Start a document chat and your conversation history will appear here.
             </p>
-            <a href="{% url 'chat:home' %}" class="mt-6 inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+            <a href="{% url 'chat:home' %}" class="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-950/25 transition duration-300 hover:-translate-y-1 hover:bg-primary-700 hover:shadow-xl">
+                <i data-lucide="bot" class="h-4 w-4"></i>
                 Open AI Chat
             </a>
         </section>

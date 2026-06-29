@@ -6,6 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="DocuMind - AI Legal & Financial Document Analyst">
     <title>{% block title %}DocuMind{% endblock %}</title>
+    <script>
+        (function () {
+            try {
+                var theme = localStorage.getItem("documind-theme");
+                document.documentElement.dataset.theme = theme === "ai-workspace" ? "ai-workspace" : "django-classic";
+            } catch (error) {
+                document.documentElement.dataset.theme = "django-classic";
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -13,15 +26,18 @@
                 extend: {
                     colors: {
                         primary: {
-                            50: "#eff6ff",
-                            100: "#dbeafe",
-                            600: "#2563eb",
-                            700: "#1d4ed8",
-                            900: "#1e3a8a"
+                            50: "#ecfdf5",
+                            100: "#ccfbf1",
+                            600: "#0C4B33",
+                            700: "#092E20",
+                            900: "#092E20"
                         }
                     },
                     boxShadow: {
                         soft: "0 18px 45px rgba(15, 23, 42, 0.08)"
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"]
                     }
                 }
             }
@@ -30,13 +46,13 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
-<body class="min-h-screen bg-white text-slate-950 antialiased">
+<body class="min-h-screen bg-slate-50 font-sans text-slate-950 antialiased">
     <div class="flex min-h-screen flex-col">
         <header class="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur">
             <nav class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-4 lg:px-8" aria-label="Main navigation">
                 <a href="{% url 'core:home' %}" class="flex items-center gap-3">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-sm font-bold text-white shadow-lg shadow-blue-600/20">
-                        DM
+                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-white shadow-lg shadow-emerald-950/20">
+                        <i data-lucide="brain-circuit" class="h-5 w-5"></i>
                     </span>
                     <span class="text-lg font-semibold tracking-tight text-slate-950">DocuMind</span>
                 </a>
@@ -46,8 +62,13 @@
                     <a href="{% url 'core:home' %}#system" class="transition hover:text-primary-700">System</a>
                     <a href="{% url 'core:home' %}#about" class="transition hover:text-primary-700">About</a>
                     <a href="{% url 'core:home' %}#contact" class="transition hover:text-primary-700">Contact</a>
+                    <button type="button" class="dm-theme-toggle" data-theme-toggle aria-label="Switch theme" aria-pressed="false">
+                        <i data-lucide="leaf" data-theme-icon="light" aria-hidden="true"></i>
+                        <i data-lucide="brain-circuit" data-theme-icon="dark" aria-hidden="true"></i>
+                        <span class="dm-theme-label" data-theme-label>Django Classic</span>
+                    </button>
                     {% if request.user.is_authenticated %}
-                        <a href="{% url 'core:dashboard' %}" class="rounded-xl bg-primary-600 px-4 py-2 font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-primary-700">Dashboard</a>
+                        <a href="{% url 'core:dashboard' %}" class="rounded-xl bg-primary-600 px-4 py-2 font-semibold text-white shadow-lg shadow-emerald-950/20 transition hover:-translate-y-0.5 hover:bg-primary-700">Dashboard</a>
                         <form method="post" action="{% url 'accounts:logout' %}">
                             {% csrf_token %}
                             <button type="submit" class="rounded-xl border border-slate-200 bg-white px-4 py-2 font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-primary-100 hover:text-primary-700">
@@ -56,7 +77,7 @@
                         </form>
                     {% else %}
                         <a href="{% url 'accounts:login' %}" class="transition hover:text-primary-700">Login</a>
-                        <a href="{% url 'accounts:register' %}" class="rounded-xl bg-primary-600 px-4 py-2 font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-primary-700">Sign Up</a>
+                        <a href="{% url 'accounts:register' %}" class="rounded-xl bg-primary-600 px-4 py-2 font-semibold text-white shadow-lg shadow-emerald-950/20 transition hover:-translate-y-0.5 hover:bg-primary-700">Sign Up</a>
                     {% endif %}
                 </div>
             </nav>
@@ -66,6 +87,7 @@
             {% block content %}{% endblock %}
         </main>
     </div>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>

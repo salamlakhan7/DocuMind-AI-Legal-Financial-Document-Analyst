@@ -1,5 +1,48 @@
 document.documentElement.classList.add("js-enabled");
 
+const THEME_STORAGE_KEY = "documind-theme";
+const LIGHT_THEME = "django-classic";
+const DARK_THEME = "ai-workspace";
+
+const getStoredTheme = () => {
+    try {
+        return localStorage.getItem(THEME_STORAGE_KEY);
+    } catch (error) {
+        return null;
+    }
+};
+
+const setStoredTheme = (theme) => {
+    try {
+        localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch (error) {
+        return;
+    }
+};
+
+const applyTheme = (theme) => {
+    const selectedTheme = theme === DARK_THEME ? DARK_THEME : LIGHT_THEME;
+    document.documentElement.dataset.theme = selectedTheme;
+    document.documentElement.classList.toggle("dark", selectedTheme === DARK_THEME);
+
+    document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+        const isDark = selectedTheme === DARK_THEME;
+        const label = button.querySelector("[data-theme-label]");
+
+        button.setAttribute("aria-pressed", String(isDark));
+        button.setAttribute(
+            "aria-label",
+            isDark ? "Switch to Django Classic theme" : "Switch to AI Workspace theme",
+        );
+
+        if (label) {
+            label.textContent = isDark ? "AI Workspace" : "Django Classic";
+        }
+    });
+};
+
+applyTheme(getStoredTheme());
+
 document.addEventListener("DOMContentLoaded", () => {
     const sidebar = document.getElementById("dashboard-sidebar");
     const backdrop = document.getElementById("sidebar-backdrop");
@@ -52,4 +95,22 @@ document.addEventListener("DOMContentLoaded", () => {
             submitButton.classList.add("cursor-wait", "opacity-80");
         });
     });
+
+    document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+        button.addEventListener("click", () => {
+            const nextTheme = document.documentElement.dataset.theme === DARK_THEME ? LIGHT_THEME : DARK_THEME;
+            applyTheme(nextTheme);
+            setStoredTheme(nextTheme);
+        });
+    });
+
+    applyTheme(getStoredTheme());
+
+    if (window.lucide) {
+        window.lucide.createIcons({
+            attrs: {
+                "stroke-width": 2,
+            },
+        });
+    }
 });
